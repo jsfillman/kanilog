@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app.kubernetes.io/name: kaniko-{{image_name }}
+  name: kaniko-{{image_name }}
+spec:
+  containers:
+  - name: kaniko-{{ image_name }}
+    image: gcr.io/kaniko-project/executor:latest
+    args:
+    - "--dockerfile=./Dockerfile"
+    - "--context={{ repo_name }}"
+    - "--destination=registry:5000/{{ image_name }}:{{ image_tag }}"
+    - "--insecure"
+    - "--insecure-registry=dockerhub:5000"
+    securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+            add:
+                - CHOWN
+                - DAC_OVERRIDE
+                - FOWNER
+                - NET_BIND_SERVICE
+                - SETGID
+                - SETUID
+            drop:
+                - ALL
+  restartPolicy: Never
